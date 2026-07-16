@@ -1,0 +1,24 @@
+---
+description: House config hub
+alwaysApply: true
+---
+
+# House config hub
+
+Canonical registry: `C:\Users\Edouard\Projects\house-master-engine`
+
+This repo (**house-lib**) is a shared Python package for the house automation stack (not a Docker service).
+
+When you change the public API, install/deploy story, or VERSION, also update house-master-engine:
+
+| Change | Update in house-master-engine |
+|--------|-------------------------------|
+| Public API / modules | `docs/inventory.md`, `docs/architecture.md`, `docs/optimization.md` |
+| NAS install / staging | `scripts/deploy-nas-remote.sh`, `docs/deploy-workflow.md` |
+| VERSION bump | Consumers pin/rebuild; shore-up / optimization status |
+
+**Never put secrets in house-lib.**
+
+When bumping `VERSION`, update `CHANGELOG.md` in the same commit.
+
+Before finishing, ask: "Did I update house-master-engine?"
