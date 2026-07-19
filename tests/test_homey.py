@@ -36,8 +36,13 @@ def test_sync_set_capability() -> None:
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_async_ping_failure() -> None:
+async def test_async_update_logic_variable_uses_flat_body() -> None:
     base = "http://homey.test"
-    respx.get(f"{base}/api/manager/system").mock(side_effect=httpx.ConnectError("down"))
+    route = respx.put(f"{base}/api/manager/logic/variable/var1").respond(
+        200, json={"id": "var1", "name": "hc_logic_synced_at", "type": "number", "value": 42}
+    )
     client = AsyncHomeyClient(base, "token")
-    assert await client.ping() is False
+    result = await client.update_logic_variable("var1", 42)
+    assert route.called
+    assert route.calls.last.request.content == b'{"value":42}'
+    assert result["value"] == 42

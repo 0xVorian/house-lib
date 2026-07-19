@@ -79,9 +79,11 @@ class AsyncHomeyClient:
         return data if isinstance(data, dict) else {}
 
     async def update_logic_variable(self, variable_id: str, value: Any) -> dict[str, Any]:
+        # Homey local REST expects a flat body. Nested {"variable":{"value":…}} returns
+        # HTTP 200 but leaves the value unchanged (verified on Homey Pro).
         return await self._put(
             f"/api/manager/logic/variable/{variable_id}",
-            {"variable": {"value": value}},
+            {"value": value},
         )
 
 
