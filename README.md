@@ -9,7 +9,7 @@ Shared Python package for the house automation NAS stack: Homey HTTP client, hub
 ```bash
 pip install -e .
 # or from GitHub (after publish):
-# pip install "house-lib @ git+https://github.com/0xVorian/house-lib.git@v0.1.0"
+# pip install "house-lib @ git+https://github.com/0xVorian/house-lib.git@v0.1.1"
 ```
 
 NAS Docker: deploy stages a sibling `/volume5/docker/house-lib` clone into `.house-lib-src` in the consumer build context (see house-context Dockerfile + `deploy-nas-remote.sh`).

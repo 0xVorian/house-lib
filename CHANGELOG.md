@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Homey Logic variable PUT uses flat `{"value": …}` body — nested `variable` wrapper returned 200 but did not change the value
 
+### Changed
+
+- README install example pins `@v0.1.1`
+
 ## [0.1.0] - 2026-07-16
 
 ### Added
