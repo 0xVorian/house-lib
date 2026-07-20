@@ -21,10 +21,8 @@ pick_python() {
 
 PY="$(pick_python)"
 
-if ! "$PY" -m ruff --version >/dev/null 2>&1; then
-  echo "ci-local: installing dev dependencies..."
-  "$PY" -m pip install -q -r requirements-dev.txt
-fi
+echo "ci-local: syncing dev dependencies..."
+"$PY" -m pip install -q -r requirements-dev.txt
 
 "$PY" -m ruff check .
 "$PY" -m pytest -q
