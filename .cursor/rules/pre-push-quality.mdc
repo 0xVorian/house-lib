@@ -7,22 +7,37 @@ alwaysApply: true
 
 Do **not** `git push` (especially to `main` / `master`) while checks are failing or were not run.
 
-## Before push
+## Git hook (mechanical)
 
-1. Read `.github/workflows/ci.yml` in this repo — run the same steps locally.
+Each repo ships `.githooks/pre-push` → `scripts/ci-local.sh` (matches CI test job).
+
+**One-time per machine** (from house-master-engine):
+
+```powershell
+pwsh scripts/install-git-hooks.ps1
+```
+
+Or per repo: `git config core.hooksPath .githooks`
+
+**Bypass** (emergency only): `SKIP_CI_HOOKS=1 git push`
+
+## Before push (agents)
+
+1. Read `.github/workflows/ci.yml` — run the same steps locally, or rely on the hook after install.
 2. Fix failures in the same session, or stop **without** pushing.
-3. Push only when local checks pass (or you have verified CI would pass).
+3. Push only when checks pass.
 
 ## Typical commands
 
-| Repo type | Run before push |
-|-----------|-----------------|
-| Python NAS / hub | `python -m ruff check .` then `python -m pytest -q` |
-| homey-guest-relay | `npm test` and `npm run build` |
-| lepuy-location | `npm run lint` and `npm run build` |
-| homey-scripts | no CI — still run any relevant script checks before push |
+| Repo type | `scripts/ci-local.sh` runs |
+|-----------|---------------------------|
+| Python NAS / hub | `ruff check .` + `pytest -q` |
+| house-context | same (needs sibling `house-lib`) |
+| homey-guest-relay | `npm test` + `npm run build` |
+| lepuy-location | `npm run lint` + `npm run build` |
+| homey-scripts | noop (no CI) |
 
-Use `python -m ruff` when `ruff` is not on PATH (common on Windows). Install deps from `requirements-dev.txt` or `npm ci` — do not push hoping CI will catch missing packages.
+Use `python -m ruff` when `ruff` is not on PATH. Install deps from `requirements-dev.txt` or `npm ci` — do not push hoping CI will catch missing packages.
 
 ## Agents
 
