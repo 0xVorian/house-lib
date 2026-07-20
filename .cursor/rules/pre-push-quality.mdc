@@ -1,0 +1,31 @@
+---
+description: Do not push with failing lint, tests, or builds
+alwaysApply: true
+---
+
+# Pre-push quality gate
+
+Do **not** `git push` (especially to `main` / `master`) while checks are failing or were not run.
+
+## Before push
+
+1. Read `.github/workflows/ci.yml` in this repo — run the same steps locally.
+2. Fix failures in the same session, or stop **without** pushing.
+3. Push only when local checks pass (or you have verified CI would pass).
+
+## Typical commands
+
+| Repo type | Run before push |
+|-----------|-----------------|
+| Python NAS / hub | `python -m ruff check .` then `python -m pytest -q` |
+| homey-guest-relay | `npm test` and `npm run build` |
+| lepuy-location | `npm run lint` and `npm run build` |
+| homey-scripts | no CI — still run any relevant script checks before push |
+
+Use `python -m ruff` when `ruff` is not on PATH (common on Windows). Install deps from `requirements-dev.txt` or `npm ci` — do not push hoping CI will catch missing packages.
+
+## Agents
+
+- Do not push broken work to "let CI find it."
+- Do not push a follow-up fix for a failure you introduced unless the user asked to babysit CI.
+- Ship `VERSION` + `CHANGELOG` bumps in the same commit as passing checks.
