@@ -46,8 +46,17 @@ class AsyncHomeyClient:
         self.base_url = base_url.rstrip("/")
         self.headers = {"Authorization": f"Bearer {token}"}
         self.timeout = timeout
+        self._api_call_count = 0
+
+    def reset_api_call_count(self) -> None:
+        self._api_call_count = 0
+
+    @property
+    def api_call_count(self) -> int:
+        return self._api_call_count
 
     async def _get(self, path: str) -> dict[str, Any]:
+        self._api_call_count += 1
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.get(f"{self.base_url}{path}", headers=self.headers)
             response.raise_for_status()
@@ -55,6 +64,7 @@ class AsyncHomeyClient:
             return data if isinstance(data, dict) else {}
 
     async def _put(self, path: str, body: dict[str, Any]) -> dict[str, Any]:
+        self._api_call_count += 1
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.put(
                 f"{self.base_url}{path}",
