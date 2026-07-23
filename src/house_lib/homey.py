@@ -3,12 +3,40 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import quote
 
 import httpx
 
 log = logging.getLogger(__name__)
+
+
+def _parse_last_updated(raw: Any) -> str | None:
+    if raw is None:
+        return None
+    if isinstance(raw, (int, float)):
+        ts = float(raw)
+        if ts > 1_000_000_000_000:
+            ts /= 1000.0
+        return datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+    if isinstance(raw, str):
+        try:
+            dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt.isoformat()
+        except ValueError:
+            return None
+    return None
+
+
+def _capability_meta(caps_obj: dict[str, Any], capability: str) -> dict[str, Any]:
+    cap_data = caps_obj.get(capability) or {}
+    return {
+        "value": cap_data.get("value"),
+        "last_updated": _parse_last_updated(cap_data.get("lastUpdated")),
+    }
 
 
 class AsyncHomeyClient:
@@ -66,6 +94,13 @@ class AsyncHomeyClient:
             cap_data = caps_obj.get(cap) or {}
             result[cap] = cap_data.get("value")
         return result
+
+    async def read_device_capabilities_meta(
+        self, device_id: str, capabilities: list[str]
+    ) -> dict[str, dict[str, Any]]:
+        data = await self.get_device(device_id)
+        caps_obj = data.get("capabilitiesObj") or {}
+        return {cap: _capability_meta(caps_obj, cap) for cap in capabilities}
 
     async def set_capability(self, device_id: str, capability: str, value: Any) -> None:
         encoded = quote(capability, safe="")
@@ -130,6 +165,13 @@ class HomeyClient:
         data = self.get_device(device_id)
         caps = data.get("capabilitiesObj") or {}
         return (caps.get(capability) or {}).get("value")
+
+    def read_device_capabilities_meta(
+        self, device_id: str, capabilities: list[str]
+    ) -> dict[str, dict[str, Any]]:
+        data = self.get_device(device_id)
+        caps_obj = data.get("capabilitiesObj") or {}
+        return {cap: _capability_meta(caps_obj, cap) for cap in capabilities}
 
     def set_capability(self, device_id: str, capability: str, value: Any) -> None:
         encoded = quote(capability, safe="")
