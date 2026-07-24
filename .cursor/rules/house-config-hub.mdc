@@ -13,9 +13,12 @@ When you change the public API, install/deploy story, or VERSION, also update ho
 
 | Change | Update in house-master-engine |
 |--------|-------------------------------|
-| Public API / modules | `docs/inventory.md`, `docs/architecture.md`, `docs/optimization.md` |
+| Public API / modules | `docs/inventory.md`, `docs/architecture.md`, `docs/optimization.md`; `catalog.nodes` for house-lib if purpose/deps change |
 | NAS install / staging | `scripts/deploy-nas-remote.sh`, `docs/deploy-workflow.md` |
 | VERSION bump | Consumers pin/rebuild; shore-up / optimization status |
+| New dependency from a consumer | Consumer updates hub `catalog.nodes` (`depends_on`) |
+
+**Stack map:** before guessing ownership across the stack, read hub `catalog` / `GET /api/registry` / `#/stack`.
 
 **Never put secrets in house-lib.**
 
