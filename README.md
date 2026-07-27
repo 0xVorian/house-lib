@@ -2,7 +2,19 @@
 
 Shared Python package for the house automation NAS stack: Homey HTTP client, hub event ingest, deploy records, and `/health` build info.
 
-**Not a runnable service.** Consumers: house-context, guest-stays, pool-heating-engine, eco-sessions, echo, house-master-engine.
+**Not a runnable service.** Consumers: house-context (runtime), plus other NAS services as they migrate off local twins.
+
+## Consume this if you need
+
+| Need | Use | Do not |
+|------|-----|--------|
+| Homey REST (async) | `house_lib.homey.AsyncHomeyClient` | Copy a local Homey HTTP client |
+| Homey REST (sync) | `house_lib.homey.HomeyClient` | Duplicate pool/HVAC-style wrappers |
+| Hub event ingest | `house_lib.hub_events.emit_event` | Local `events.py` twins for `POST /api/events/ingest` |
+| Deploy SHA record | `house_lib.hub_deploy.record_deployment` | Ad-hoc deploy POSTs |
+| `/health` build fields | `house_lib.versioning.build_info` | Per-service `build_info` copies |
+
+Domain logic (bookings, thermal model, eco eligibility, planner policy) stays in service repos.
 
 ## Install
 
@@ -23,8 +35,6 @@ NAS Docker: deploy stages a sibling `/volume5/docker/house-lib` clone into `.hou
 | `house_lib.hub_events.emit_event` | `POST /api/events/ingest` |
 | `house_lib.hub_deploy.record_deployment` | `POST /api/deployments/record` |
 | `house_lib.versioning.build_info` | `{service, version, git_sha?}` |
-
-Domain logic (bookings, thermal model, eco eligibility) stays in service repos.
 
 ## House stack
 
