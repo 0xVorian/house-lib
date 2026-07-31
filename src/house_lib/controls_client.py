@@ -94,7 +94,7 @@ class ControlsClient:
         if not self.base_url:
             return ControlsSnapshot(source="bootstrap")
 
-        live = self._fetch_live(prefix=prefix)
+        live = self._fetch_live()
         if live is not None:
             values, fetched_at = live
             self._persist_cache(values, fetched_at)
@@ -118,7 +118,7 @@ class ControlsClient:
 
         return ControlsSnapshot(source="bootstrap")
 
-    def _fetch_live(self, *, prefix: str | None) -> tuple[dict[str, Any], str] | None:
+    def _fetch_live(self) -> tuple[dict[str, Any], str] | None:
         url = f"{self.base_url}/controls"
         try:
             with httpx.Client(timeout=self.timeout) as client:
@@ -139,8 +139,6 @@ class ControlsClient:
                 continue
             control_id = item.get("id")
             if not control_id:
-                continue
-            if prefix and not str(control_id).startswith(prefix):
                 continue
             if item.get("value") is not None:
                 values[str(control_id)] = item["value"]

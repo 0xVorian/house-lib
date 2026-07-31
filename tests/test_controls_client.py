@@ -71,6 +71,65 @@ def test_runtime_settings_payload_marks_stale() -> None:
     assert payload["source"] == "cached"
 
 
+_CONTROLS_PAYLOAD = {
+    "controls": [
+        {"id": "pool_heating.actuation_enabled", "value": False},
+        {"id": "pool_heating.target_guest_c", "value": 27.5},
+        {"id": "hvac.enabled", "value": True},
+        {"id": "hvac.target_guest_c", "value": 21.0},
+    ]
+}
+
+
+@respx.mock
+def test_prefix_fetch_persists_full_cache_not_subset(tmp_path: Path) -> None:
+    """Regression A-005: prefix filter must not shrink persisted cache."""
+    cache_path = tmp_path / "runtime-settings-cache.json"
+    client = ControlsClient("http://house-context.test:8095", cache_path=cache_path)
+    route = respx.get("http://house-context.test:8095/controls").mock(
+        return_value=httpx.Response(200, json=_CONTROLS_PAYLOAD)
+    )
+
+    hvac_snapshot = client.fetch(prefix="hvac")
+    assert hvac_snapshot.source == "live"
+    assert set(hvac_snapshot.values) == {"hvac.enabled", "hvac.target_guest_c"}
+
+    cached = json.loads(cache_path.read_text(encoding="utf-8"))
+    assert set(cached["values"]) == {
+        "pool_heating.actuation_enabled",
+        "pool_heating.target_guest_c",
+        "hvac.enabled",
+        "hvac.target_guest_c",
+    }
+
+    route.mock(return_value=httpx.Response(200, json=_CONTROLS_PAYLOAD))
+    pool_snapshot = client.fetch(prefix="pool_heating")
+    assert pool_snapshot.source == "live"
+    assert set(pool_snapshot.values) == {
+        "pool_heating.actuation_enabled",
+        "pool_heating.target_guest_c",
+    }
+
+
+@respx.mock
+def test_different_prefix_served_from_full_cache_when_live_down(tmp_path: Path) -> None:
+    cache_path = tmp_path / "runtime-settings-cache.json"
+    client = ControlsClient("http://house-context.test:8095", cache_path=cache_path)
+    route = respx.get("http://house-context.test:8095/controls").mock(
+        return_value=httpx.Response(200, json=_CONTROLS_PAYLOAD)
+    )
+
+    client.fetch(prefix="hvac")
+    route.mock(return_value=httpx.Response(503, json={"detail": "down"}))
+
+    pool_snapshot = client.fetch(prefix="pool_heating")
+    assert pool_snapshot.source == "cached"
+    assert set(pool_snapshot.values) == {
+        "pool_heating.actuation_enabled",
+        "pool_heating.target_guest_c",
+    }
+
+
 def test_parse_time_windows_accepts_dicts_and_pairs() -> None:
     from house_lib.controls_client import parse_time_windows
 
