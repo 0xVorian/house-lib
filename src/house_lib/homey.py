@@ -90,8 +90,8 @@ class AsyncHomeyClient:
         return await self._get("/api/manager/devices/device/")
 
     async def list_zones(self) -> dict[str, Any]:
-        """Flow zones keyed by zone id."""
-        return await self._get("/api/manager/flow/zone/")
+        """Homey zones keyed by zone id."""
+        return await self._get("/api/manager/zones/zone")
 
     async def get_device(self, device_id: str) -> dict[str, Any]:
         return await self._get(f"/api/manager/devices/device/{device_id}")
@@ -180,7 +180,7 @@ class HomeyClient:
         return self._get("/api/manager/devices/device/")
 
     def list_zones(self) -> dict[str, Any]:
-        return self._get("/api/manager/flow/zone/")
+        return self._get("/api/manager/zones/zone")
 
     def get_device(self, device_id: str) -> dict[str, Any]:
         return self._get(f"/api/manager/devices/device/{device_id}")

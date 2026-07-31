@@ -101,7 +101,7 @@ async def test_async_list_devices_and_zones() -> None:
         200,
         json={"dev1": {"id": "dev1", "name": "Thermo", "class": "sensor", "zone": "z1"}},
     )
-    respx.get(f"{base}/api/manager/flow/zone/").respond(
+    respx.get(f"{base}/api/manager/zones/zone").respond(
         200,
         json={"z1": {"id": "z1", "name": "Salon"}},
     )
@@ -116,7 +116,7 @@ async def test_async_list_devices_and_zones() -> None:
 def test_sync_list_devices_and_zones() -> None:
     base = "http://homey.test"
     respx.get(f"{base}/api/manager/devices/device/").respond(200, json={"dev1": {"id": "dev1"}})
-    respx.get(f"{base}/api/manager/flow/zone/").respond(200, json={"z1": {"id": "z1"}})
+    respx.get(f"{base}/api/manager/zones/zone").respond(200, json={"z1": {"id": "z1"}})
     client = HomeyClient(base, "token")
     assert "dev1" in client.list_devices()
     assert "z1" in client.list_zones()
