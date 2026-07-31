@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from house_lib.controls_client import ControlsClient, ControlsSnapshot, runtime_settings_payload
+from house_lib.controls_client import ControlsClient, ControlsSnapshot, parse_time_windows, runtime_settings_payload
 from house_lib.hub_deploy import record_deployment, record_deployment_sync
 from house_lib.hub_events import emit_event, emit_event_sync
 from house_lib.homey import AsyncHomeyClient, HomeyClient
@@ -17,6 +17,7 @@ __all__ = [
     "emit_event_sync",
     "read_git_sha",
     "read_version",
+    "parse_time_windows",
     "record_deployment",
     "record_deployment_sync",
     "runtime_settings_payload",

@@ -43,6 +43,11 @@ class ControlsSnapshot:
             return str(self.values[control_id])
         return default
 
+    def get_json(self, control_id: str, default: Any = None) -> Any:
+        if control_id in self.values:
+            return self.values[control_id]
+        return default
+
 
 def _auth_headers(token: str | None) -> dict[str, str]:
     secret = (token or "").strip()
@@ -193,3 +198,20 @@ def runtime_settings_payload(snapshot: ControlsSnapshot, *, stale_after_seconds:
         "age_seconds": age,
         "stale": stale,
     }
+
+
+def parse_time_windows(value: Any) -> list[dict[str, int]]:
+    """Normalize time window control values to {start_min, end_min} dicts."""
+    if not isinstance(value, list):
+        raise ValueError("time_windows value must be a list")
+    windows: list[dict[str, int]] = []
+    for index, window in enumerate(value):
+        if isinstance(window, dict):
+            start = window.get("start_min")
+            end = window.get("end_min")
+        elif isinstance(window, (list, tuple)) and len(window) == 2:
+            start, end = window
+        else:
+            raise ValueError(f"time_windows entry {index} is invalid")
+        windows.append({"start_min": int(start), "end_min": int(end)})
+    return windows
