@@ -85,6 +85,14 @@ class AsyncHomeyClient:
             log.warning("Homey ping failed: %s", exc)
             return False
 
+    async def list_devices(self) -> dict[str, Any]:
+        """All devices keyed by UUID (Homey REST shape)."""
+        return await self._get("/api/manager/devices/device/")
+
+    async def list_zones(self) -> dict[str, Any]:
+        """Flow zones keyed by zone id."""
+        return await self._get("/api/manager/flow/zone/")
+
     async def get_device(self, device_id: str) -> dict[str, Any]:
         return await self._get(f"/api/manager/devices/device/{device_id}")
 
@@ -167,6 +175,12 @@ class HomeyClient:
         except Exception as exc:
             log.warning("Homey ping failed: %s", exc)
             return False
+
+    def list_devices(self) -> dict[str, Any]:
+        return self._get("/api/manager/devices/device/")
+
+    def list_zones(self) -> dict[str, Any]:
+        return self._get("/api/manager/flow/zone/")
 
     def get_device(self, device_id: str) -> dict[str, Any]:
         return self._get(f"/api/manager/devices/device/{device_id}")
