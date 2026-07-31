@@ -69,3 +69,12 @@ def test_runtime_settings_payload_marks_stale() -> None:
     )
     assert payload["stale"] is True
     assert payload["source"] == "cached"
+
+
+def test_parse_time_windows_accepts_dicts_and_pairs() -> None:
+    from house_lib.controls_client import parse_time_windows
+
+    assert parse_time_windows([{"start_min": 88, "end_min": 418}]) == [
+        {"start_min": 88, "end_min": 418}
+    ]
+    assert parse_time_windows([[100, 200]]) == [{"start_min": 100, "end_min": 200}]
