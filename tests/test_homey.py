@@ -91,3 +91,32 @@ def test_sync_read_device_capabilities_meta() -> None:
     meta = client.read_device_capabilities_meta("dev1", ["measure_temperature"])
     assert meta["measure_temperature"]["value"] == 18.5
     assert meta["measure_temperature"]["last_updated"] == "2026-07-23T08:00:00+00:00"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_list_devices_and_zones() -> None:
+    base = "http://homey.test"
+    respx.get(f"{base}/api/manager/devices/device/").respond(
+        200,
+        json={"dev1": {"id": "dev1", "name": "Thermo", "class": "sensor", "zone": "z1"}},
+    )
+    respx.get(f"{base}/api/manager/flow/zone/").respond(
+        200,
+        json={"z1": {"id": "z1", "name": "Salon"}},
+    )
+    client = AsyncHomeyClient(base, "token")
+    devices = await client.list_devices()
+    zones = await client.list_zones()
+    assert devices["dev1"]["name"] == "Thermo"
+    assert zones["z1"]["name"] == "Salon"
+
+
+@respx.mock
+def test_sync_list_devices_and_zones() -> None:
+    base = "http://homey.test"
+    respx.get(f"{base}/api/manager/devices/device/").respond(200, json={"dev1": {"id": "dev1"}})
+    respx.get(f"{base}/api/manager/flow/zone/").respond(200, json={"z1": {"id": "z1"}})
+    client = HomeyClient(base, "token")
+    assert "dev1" in client.list_devices()
+    assert "z1" in client.list_zones()
