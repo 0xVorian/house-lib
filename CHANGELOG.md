@@ -5,11 +5,22 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2026-08-07
+
+### Fixed
+
+- Packaging honesty: `pyproject.toml` version was stuck at 0.3.0 while `VERSION` / `__version__` were 0.3.1 — align all three and assert in tests
+- README / AGENTS: mention `ControlsClient` for consumers
+
 ## [0.3.1] - 2026-07-31
 
 ### Fixed
 
 - `ControlsClient.fetch(prefix=...)` no longer persists a prefix-filtered subset to the sticky cache (audit A-005)
+
+### Note
+
+- Wheel / `pyproject.toml` metadata for this release incorrectly still reported 0.3.0; use 0.3.2+
 
 ## [0.3.0] - 2026-07-31
 

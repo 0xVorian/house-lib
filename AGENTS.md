@@ -6,6 +6,7 @@ Shared Python helpers for house automation NAS services.
 
 - **Homey client** — `AsyncHomeyClient` / `HomeyClient`
 - **Hub events / deploy** — `hub_events.emit_event`, `hub_deploy.record_deployment`
+- **Runtime controls** — `ControlsClient` (batched `GET /controls` + sticky cache)
 - **Health build info** — `versioning.build_info`
 
 Do **not** add a local twin of these modules in a NAS service; prefer house-lib and stage via `.house-lib-src` when the Docker image needs it.
