@@ -1,8 +1,8 @@
 # house-lib
 
-Shared Python package for the house automation NAS stack: Homey HTTP client, hub event ingest, deploy records, and `/health` build info.
+Shared Python package for the house automation NAS stack: Homey HTTP client, hub event ingest, deploy records, runtime controls client, and `/health` build info.
 
-**Not a runnable service.** Consumers: house-context (runtime), plus other NAS services as they migrate off local twins.
+**Not a runnable service.**
 
 ## Consume this if you need
 
@@ -22,7 +22,7 @@ Domain logic (bookings, thermal model, eco eligibility, planner policy) stays in
 ```bash
 pip install -e .
 # or from GitHub (after publish):
-# pip install "house-lib @ git+https://github.com/0xVorian/house-lib.git@v0.1.1"
+# pip install "house-lib @ git+https://github.com/0xVorian/house-lib.git@v0.3.2"
 ```
 
 NAS Docker: deploy stages a sibling `/volume5/docker/house-lib` clone into `.house-lib-src` in the consumer build context (see house-context Dockerfile + `deploy-nas-remote.sh`).
@@ -40,7 +40,17 @@ NAS Docker: deploy stages a sibling `/volume5/docker/house-lib` clone into `.hou
 
 ## House stack
 
-Catalog node `house-lib` — zone `lib`, no port, no runbook, `depends_on: []`. It is a **shared package, not a Docker service**: it never appears in health checks or deploy records of its own. Consumers today: [house-context](https://github.com/0xVorian/house-context) (runtime); other NAS services as they migrate off local twins.
+Catalog node `house-lib` — zone `lib`, no port, no runbook, `depends_on: []`. It is a **shared package, not a Docker service**: it never appears in health checks or deploy records of its own.
+
+**Consumers (stage via `.house-lib-src` or editable install):**
+
+| Service | Typical imports |
+|---------|-----------------|
+| [house-context](https://github.com/0xVorian/house-context) | `AsyncHomeyClient`, `build_info`, hub events/deploy |
+| [pool-heating-engine](https://github.com/0xVorian/pool-heating-engine) | `HomeyClient`, `ControlsClient`, hub events |
+| [hvac-engine](https://github.com/0xVorian/hvac-engine) | `AsyncHomeyClient`, `ControlsClient`, hub events |
+| [eco-sessions](https://github.com/0xVorian/eco-sessions) | `ControlsClient`, hub helpers |
+| [echo](https://github.com/0xVorian/echo) | hub events / versioning as adopted |
 
 Config registry: [house-master-engine/docs/config.md](https://github.com/0xVorian/house-master-engine/blob/main/docs/config.md). Full stack map (do not duplicate it here): hub [`config/services.yaml`](https://github.com/0xVorian/house-master-engine/blob/main/config/services.yaml) `catalog` · `#/stack` · `GET /api/registry`.
 
