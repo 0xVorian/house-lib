@@ -24,4 +24,4 @@ __all__ = [
     "utc_now_iso",
 ]
 
-__version__ = "0.3.3"
+__version__ = "0.3.4"

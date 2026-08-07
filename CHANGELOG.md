@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] - 2026-08-07
+
+### Fixed
+
+- `ControlsSnapshot.get_bool` coerces string/number forms (`"false"` / `"0"`) instead of Python truthiness
+- `get_bool` default is now **False** (fail-closed) — callers that want fail-open must pass `default=True` explicitly (pool/HVAC already do for `*.enabled`)
+
+### Added
+
+- `coerce_bool()` helper for shared control value parsing
+
 ## [0.3.3] - 2026-08-07
 
 ### Changed

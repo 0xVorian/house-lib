@@ -137,3 +137,23 @@ def test_parse_time_windows_accepts_dicts_and_pairs() -> None:
         {"start_min": 88, "end_min": 418}
     ]
     assert parse_time_windows([[100, 200]]) == [{"start_min": 100, "end_min": 200}]
+
+
+def test_get_bool_default_is_fail_closed() -> None:
+    from house_lib.controls_client import ControlsSnapshot
+
+    snapshot = ControlsSnapshot(values={})
+    assert snapshot.get_bool("missing.flag") is False
+    assert snapshot.get_bool("missing.flag", True) is True
+
+
+def test_get_bool_coerces_string_false() -> None:
+    from house_lib.controls_client import ControlsSnapshot, coerce_bool
+
+    snapshot = ControlsSnapshot(values={"hvac.enabled": "false", "hvac.actuation_enabled": "0"})
+    assert snapshot.get_bool("hvac.enabled", True) is False
+    assert snapshot.get_bool("hvac.actuation_enabled", True) is False
+    assert coerce_bool("true") is True
+    assert coerce_bool("yes") is True
+    assert coerce_bool(1) is True
+    assert coerce_bool(0) is False
