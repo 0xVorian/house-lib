@@ -16,6 +16,25 @@ log = logging.getLogger(__name__)
 Source = Literal["live", "cached", "bootstrap"]
 
 
+def coerce_bool(value: Any, default: bool = False) -> bool:
+    """Coerce control values to bool without Python's truthy-string trap.
+
+    ``bool("false")`` is True in Python — this helper treats common string/number
+    forms explicitly. Unrecognized values fall back to ``default``.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)) and value == value:
+        return value != 0
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"1", "true", "yes", "on"}:
+            return True
+        if normalized in {"0", "false", "no", "off", ""}:
+            return False
+    return default
+
+
 @dataclass
 class ControlsSnapshot:
     values: dict[str, Any] = field(default_factory=dict)
@@ -23,9 +42,15 @@ class ControlsSnapshot:
     fetched_at: str | None = None
     age_seconds: float | None = None
 
-    def get_bool(self, control_id: str, default: bool = True) -> bool:
+    def get_bool(self, control_id: str, default: bool = False) -> bool:
+        """Return a bool control value.
+
+        Default is **False** (fail-closed) for missing keys — new call sites must
+        pass ``default=True`` explicitly if fail-open is intentional. Actuation
+        gates in consumers should still require trusted ``source`` (live/cached).
+        """
         if control_id in self.values:
-            return bool(self.values[control_id])
+            return coerce_bool(self.values[control_id], default)
         return default
 
     def get_float(self, control_id: str, default: float) -> float:

@@ -10,7 +10,7 @@ Shared Python package for the house automation NAS stack: Homey HTTP client, hub
 |------|-----|--------|
 | Homey REST (async) | `house_lib.homey.AsyncHomeyClient` | Copy a local Homey HTTP client |
 | Homey REST (sync) | `house_lib.homey.HomeyClient` | Duplicate pool/HVAC-style wrappers |
-| Runtime controls | `house_lib.ControlsClient` | Local `/controls` fetch + cache twins |
+| Runtime controls | `house_lib.ControlsClient` / `ControlsSnapshot.get_bool` (default **False**, fail-closed) | Local `/controls` fetch + cache twins; do not use bare `bool(str)` |
 | Hub event ingest | `house_lib.hub_events.emit_event` | Local `events.py` twins for `POST /api/events/ingest` |
 | Deploy SHA record | `house_lib.hub_deploy.record_deployment` | Ad-hoc deploy POSTs |
 | `/health` build fields | `house_lib.versioning.build_info` | Per-service `build_info` copies |
@@ -22,7 +22,7 @@ Domain logic (bookings, thermal model, eco eligibility, planner policy) stays in
 ```bash
 pip install -e .
 # or from GitHub (after publish):
-# pip install "house-lib @ git+https://github.com/0xVorian/house-lib.git@v0.3.2"
+# pip install "house-lib @ git+https://github.com/0xVorian/house-lib.git@v0.3.4"
 ```
 
 NAS Docker: deploy stages a sibling `/volume5/docker/house-lib` clone into `.house-lib-src` in the consumer build context (see house-context Dockerfile + `deploy-nas-remote.sh`).
